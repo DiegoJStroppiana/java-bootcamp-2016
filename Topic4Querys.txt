@@ -1,0 +1,133 @@
+/*Topic 4 Querys*/
+
+CREATE database high_school;
+
+USE high_school;
+
+CREATE TABLE student(
+id_student int NOT NULL PRIMARY KEY,
+last_name varchar(20) NOT NULL,
+first_name varchar(20) NOT NULL,
+date_of_birth date
+);
+
+
+CREATE TABLE teacher(
+id_teacher int NOT NULL PRIMARY KEY,
+last_name char(20) NOT NULL,
+first_name char(20) NOT NULL,
+date_of_birth date NOT NULL
+);
+
+CREATE TABLE course(
+id_course int NOT NULL PRIMARY KEY,
+course_name varchar(20),
+hours_by_week int NOT NULL,
+id_teacher int NOT NULL,
+FOREIGN KEY (id_teacher) REFERENCES teacher(id_teacher)
+);
+
+
+CREATE TABLE schedule_time(
+day_of_the_week varchar(10) NOT NULL,
+day_number int NOT NULL,
+start_time time NOT NULL,
+end_time time NOT NULL,
+id_course int NOT NULL,
+FOREIGN KEY (id_course) REFERENCES course(id_course)
+);
+
+
+CREATE TABLE inscription(
+id_course int NOT NULL,
+id_student int NOT NULL,
+year int NOT NULL,
+final_note int NOT NULL,
+partial_note_one int NOT NULL,
+partial_note_two int NOT NULL,
+partial_note_three int NOT NULL,
+FOREIGN KEY (id_student) REFERENCES student (id_student),
+FOREIGN KEY (id_course) REFERENCES course(id_course)
+);
+
+INSERT INTO student (id_student, last_name, first_name, date_of_birth)
+	VALUES (1, "Diego", "Stroppiana", '19931119'),
+		(2, "Julian", "Aiup", '19931230'),
+		(3, "Tomas", "Pierantoni", '19950610'),
+		(4, "Juanc", "Almeida", '19930809'),
+		(5, "Esteban", "Natale", '19931013'),
+		(6, "Federico", "Aguirre", '19930728'),
+		(7, "Valentin", "Marimon", '19940416'),
+		(8, "Nicolas", "Totaro", '19930712'),
+		(9, "Franco", "Hernandez", '19940109'),
+		(10, "Marco", "Brusa", '19940119');
+
+INSERT INTO teacher (id_teacher, first_name, last_name, date_of_birth)
+	VALUES (1, "Luis", "Feraboli", '19600130'),
+		(2, "Juan", "Moine", '19891030'),
+		(3, "Ezequiel", "Porta", '19800220');
+
+
+INSERT INTO course (id_course, course_name, hours_by_week, id_teacher)
+	VALUES (1, "Resourse Management", 6 , 1),
+		(2, "Management Systems", 6, 1),
+		(3, "Artificial Int", 6 , 3);
+
+INSERT INTO schedule_time (day_of_the_week, day_number, start_time, end_time, id_course)
+	VALUES ("Monday", 1 , '08:00', '10:00', 1),
+		("Wednesday", 3 , '08:00', '10:00', 1),
+		("Friday", 5 , '08:00', '10:00', 1),
+		("Monday", 1 , '10:00', '12:00', 2),
+		("Tuesday", 2 , '08:00', '10:00', 2),
+		("Thursday", 4 , '08:00', '10:00', 2);
+
+
+INSERT INTO inscription (id_course, id_student, year, final_note,partial_note_one,partial_note_two,partial_note_three) 
+	VALUES (1, 1, 2015, 9, 8, 9, 10),
+	       (1, 2, 2015, 9, 10, 8, 9),
+	       (1, 3, 2015, 8, 8, 8, 8),
+	       (1, 4, 2015, 4, 4, 5, 3),
+	       (1, 5, 2015, 8, 8, 8, 8),
+	       (1, 6, 2015, 6, 6, 6, 6),
+	       (1, 7, 2015, 6, 5, 5, 8),
+	       (1, 8, 2015, 4, 4, 4, 4),
+	       (1, 9, 2015, 1, 1, 1, 1),
+	       (1, 10, 2015, 8, 8, 8, 8);
+
+
+/*Exercise 3 (Without format)*/
+
+SELECT course_name, CONCAT_WS("",teacher.last_name,", ",teacher.first_name) 'Teacher', CONCAT_WS("",student.last_name,", ", student.first_name) 'Student' 
+	FROM student INNER JOIN inscription ON student.id_student=inscription.id_student
+		     INNER JOIN course ON inscription.id_course=course.id_course
+		     INNER JOIN teacher ON course.id_teacher=teacher.id_teacher
+WHERE course.id_course=1
+ORDER BY student.last_name;
+
+
+
+
+/*Exercise 4*/
+
+
+SELECT count(*)/(SELECT count(*) FROM inscription WHERE id_course=1)*100 
+		'Percentaje of students that passed the exam in Artificial Intelligence in 2015'
+FROM inscription where id_course=1 and final_note>=6 and year=2015; 
+
+
+SELECT count(*)/(SELECT count(*) FROM inscription WHERE id_course=1)*100 
+		'Percentaje of students that failed the exam in Artificial Intelligence in 2015'
+FROM inscription where id_course=1 and final_note<6 and year=2015; 
+
+
+
+/*Exercise 5 (without format)*/
+
+SELECT teacher.last_name, teacher.first_name, day_of_the_week, start_time, end_time, course_name
+	FROM teacher INNER JOIN course on teacher.id_teacher=course.id_teacher
+		     INNER JOIN schedule_time st ON st.id_course=course.id_course
+WHERE teacher.id_teacher=1
+ORDER BY st.day_number;
+
+
+
