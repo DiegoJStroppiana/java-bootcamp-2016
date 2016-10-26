@@ -1,0 +1,5 @@
+/*Topic 5*/
+/*Exercise 3*/
+/*Fetch all courses ordered by name for a given teacher.*/
+
+db.course.find({id_teacher: 1}).sort({course_name: 1});
