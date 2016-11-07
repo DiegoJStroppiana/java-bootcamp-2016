@@ -9,7 +9,6 @@ public class InscriptionDAO extends BasicDAO<Inscription,String>{
 
 	protected InscriptionDAO(MongoClient mongoClient, Morphia morphia, String dbName) {
 		super(mongoClient, morphia, dbName);
-		// TODO Auto-generated constructor stub
 	}
 
 }

@@ -11,7 +11,6 @@ public class TeacherDAO extends BasicDAO<Teacher,String>{
 
 	protected TeacherDAO(MongoClient mongoClient, Morphia morphia, String dbName) {
 		super(mongoClient, morphia, dbName);
-		// TODO Auto-generated constructor stub
 	}
 
 	

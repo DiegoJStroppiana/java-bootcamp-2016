@@ -36,7 +36,6 @@ public class App
               
         
         for (Inscription ins : inscriptionGreaterThanFour) {
-        	//System.out.println(ins.getStudent().toString());
         	Query<Student> query2 = datastore.createQuery(Student.class);
         	query2.and(       
         			query2.criteria("_id").equal(ins.getStudent())
