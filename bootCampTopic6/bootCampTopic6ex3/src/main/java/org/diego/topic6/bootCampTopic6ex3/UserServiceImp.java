@@ -17,9 +17,9 @@ public class UserServiceImp implements UserService {
 	}
 
 	@RequestMapping("/addUser")
-	public String addUser(@RequestParam(value="nickname", defaultValue="null")String nickname,
-							@RequestParam(value="name", defaultValue="null")String name, 
-							@RequestParam(value="surname", defaultValue="null") String surname) {
+	public String addUser(@RequestParam(value="nickname", defaultValue="")String nickname,
+							@RequestParam(value="name", defaultValue="")String name, 
+							@RequestParam(value="surname", defaultValue="") String surname) {
 		for (User u : userList){
 			if (u.getNickname().equals(nickname)){
 				return "Nickname is already in use";
@@ -30,7 +30,7 @@ public class UserServiceImp implements UserService {
 	}
 
 	@RequestMapping("/deleteUser")
-	public String deleteUser(@RequestParam(value="nickname", defaultValue="null")String nickname) {
+	public String deleteUser(@RequestParam(value="nickname", defaultValue="")String nickname) {
 		for(User u: userList){
 			if(u.getNickname().equals(nickname)){
 				userList.remove(u);
@@ -43,7 +43,7 @@ public class UserServiceImp implements UserService {
 	}
 
 	@RequestMapping("/findByName")
-	public User findByName(@RequestParam(value="name", defaultValue="null")String name) {	
+	public User findByName(@RequestParam(value="name", defaultValue="")String name) {	
 		for (User u: userList){
 			if (u.getName().equals(name)){
 				return u;
@@ -53,9 +53,9 @@ public class UserServiceImp implements UserService {
 	}
 
 	@RequestMapping("/updateUser")
-	public String updateUser(@RequestParam(value="nickname", defaultValue="null")String nickname,
-							@RequestParam(value="name", defaultValue="null")String name, 
-							@RequestParam(value="surname", defaultValue="null") String surname) {
+	public String updateUser(@RequestParam(value="nickname", defaultValue="")String nickname,
+							@RequestParam(value="name", defaultValue="")String name, 
+							@RequestParam(value="surname", defaultValue="") String surname) {
 		for (User u: userList){
 			if (u.getNickname().equals(u.getNickname())){
 				u.setName(name);
@@ -67,7 +67,7 @@ public class UserServiceImp implements UserService {
 	}
 
 	@RequestMapping("/findByNickName")
-	public User findByNickName(@RequestParam(value="nickname", defaultValue="null") String nickname) {
+	public User findByNickName(@RequestParam(value="nickname", defaultValue="") String nickname) {
 		for (User u: userList){
 			if (u.getNickname().equals(nickname)){
 				return u;

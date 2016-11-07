@@ -18,7 +18,7 @@ public class ServiceShoppingCartImp implements ServiceShoppingCart{
 	}
 	
 	@RequestMapping("/add")
-	public String addItem(@RequestParam(value="name", defaultValue="null") String name , @RequestParam(value="price", defaultValue="0") double price  ) {
+	public String addItem(@RequestParam(value="name", defaultValue="") String name , @RequestParam(value="price", defaultValue="0") double price  ) {
 		Item i = new Item(name, price);
 		cartInstance.addItem(i);
 		return "Item " + name + " added";
@@ -26,7 +26,7 @@ public class ServiceShoppingCartImp implements ServiceShoppingCart{
 	}
 
 	@RequestMapping("/delete")
-	public String deleteItem(@RequestParam(value="name", defaultValue="null") String name) {
+	public String deleteItem(@RequestParam(value="name", defaultValue="") String name) {
 		cartInstance.deleteItem(name);
 		return "Item " + name + " deleted";
 	}
