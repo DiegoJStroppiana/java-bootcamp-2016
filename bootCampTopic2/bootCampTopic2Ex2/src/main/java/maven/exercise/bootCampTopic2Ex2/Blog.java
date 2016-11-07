@@ -38,14 +38,21 @@ public class Blog {
 		}
 		
 		public void showRecentEntries(){
-			System.out.println("Recent entries list:");
-			for (int i=0;i<10;i++){
+			System.out.println("Recent entries list:");			
+			for (int i=0;i<entries.size()&&i<10;i++){
 				String title=entries.get(i).getTitle();
 				String text=entries.get(i).getText();
 				System.out.println((i+1)+". Title: " + title + "    Text: " + text);
 			}
 		}
+
+		public ArrayList<Entry> getEntries() {
+			return entries;
+		}
 		
+		public void setEntriesNull(){
+			entries= new ArrayList<Entry>();
+		}
 		
 		
 }
