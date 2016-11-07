@@ -7,11 +7,10 @@ import data.ConnectionDB;
 public class MainClass {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 	    try {
-			new ConnectionDB();
+			ConnectionDB connection = new ConnectionDB();
+			connection.consultTeachers();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

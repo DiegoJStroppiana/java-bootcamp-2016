@@ -15,21 +15,26 @@ public class ConnectionDB {
       public ConnectionDB() throws SQLException{
       try {
 		Class.forName("com.mysql.jdbc.Driver");
-	    connect = DriverManager.getConnection("jdbc:mysql://localhost/high_school2","root","Globant2016");
-	    
-	    
+	    connect = DriverManager.getConnection("jdbc:mysql://localhost/high_school","root","Globant2016");    
 	  } catch (ClassNotFoundException e) {
 		e.printStackTrace();
 	  }
-      statement = connect.createStatement();
 
-      resultSet = statement
+      }
+      
+      public void consultTeachers(){
+          try {
+			statement = connect.createStatement();
+	        resultSet = statement
                       .executeQuery("SELECT teacher.last_name, teacher.first_name, day_of_the_week, start_time, end_time, course_name"
                     		  +" FROM teacher INNER JOIN course on teacher.id_teacher=course.id_teacher"
                     		  +" INNER JOIN schedule_time st ON st.id_course=course.id_course"
                     		  +" WHERE teacher.id_teacher=1"
                     		  +" ORDER BY st.day_number");
-      writeResultSet(resultSet);
+	        writeResultSet(resultSet);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
       }
       
       private void writeResultSet(ResultSet resultSet) throws SQLException {
