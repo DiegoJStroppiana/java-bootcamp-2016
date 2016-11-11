@@ -1,0 +1,82 @@
+/*Final project querys*/
+
+CREATE database final_project;
+
+USE final_project;
+
+CREATE TABLE user(
+id_user int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+nick_name varchar(20) NOT NULL,
+password varchar(20) NOT NULL,
+first_name varchar(20) NOT NULL,
+last_name varchar(20) NOT NULL
+);
+
+
+CREATE TABLE cart(
+id_cart int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+id_user int NOT NULL,
+state varchar(20) NOT NULL,
+FOREIGN KEY (id_user) REFERENCES user(id_user)
+);
+
+CREATE TABLE product(
+id_product int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+name varchar(60) NOT NULL,
+category varchar(40) NOT NULL,
+stock int NOT NULL
+);
+
+CREATE TABLE cart_product(
+id_cart int NOT NULL,
+id_product int NOT NULL,
+quantity int NOT NULL,
+FOREIGN KEY (id_cart) REFERENCES cart(id_cart),
+FOREIGN KEY (id_product) REFERENCES product(id_product)
+);
+
+
+
+CREATE TABLE product_price(
+id_product int NOT NULL,
+price decimal(10,2) NOT NULL,
+date_from date NOT NULL,
+FOREIGN KEY (id_product) REFERENCES product(id_product)
+);
+
+
+INSERT INTO product(name, category, stock)
+	VALUES ("Tennis raquet Wilson", "Sports", 100),
+		("Newell's Football shirt", "Sports", 500),
+		("Jockey stick", "Sports", 50),
+		("Rugby ball", "Sports", 100),
+		("Newell's Football pants","Sports", 500),
+		("Notebook Dell i7", "Electronics", 150),
+		("Samsung S7 EDGE", "Electronics", 200),
+		("Moto X Play 32gb", "Electronics", 300),
+		("Moto X Play 16gb", "Electronics", 300),
+		("Samsung J7", "Electronics", 100),
+		("Samsung A5", "Electronics", 150),
+		("Samsung Smart TV 55", "Electronics", 50),
+		("Table 200x150", "Home", 50),
+		("Fridge Whirlpool", "Home", 100),
+		("Microwave Philips", "Home", 150);
+
+INSERT INTO product_price(id_product, price, date_from)
+	VALUES (1,4500,'20161108'),
+		(2,1150,'20161108'),
+		(3,2500,'20161108'),
+		(4,500,'20161108'),
+		(5,750,'20161108'),
+		(6,35000,'20161108'),
+		(7,20000,'20161108'),
+		(8,8500,'20161108'),
+		(9,6500,'20161108'),
+		(10,4500,'20161108'),
+		(11,5500,'20161108'),
+		(12,35000,'20161108'),
+		(13,3500,'20161108'),
+		(14,7500,'20161108'),
+		(15,3500,'20161108');
+
+
