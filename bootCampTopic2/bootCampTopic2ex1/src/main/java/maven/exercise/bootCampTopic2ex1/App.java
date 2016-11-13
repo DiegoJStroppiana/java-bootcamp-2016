@@ -1,4 +1,4 @@
-package maven.exercise.bootCampTopic1Ex123;
+package maven.exercise.bootCampTopic2ex1;
 
 /**
  * Hello world!

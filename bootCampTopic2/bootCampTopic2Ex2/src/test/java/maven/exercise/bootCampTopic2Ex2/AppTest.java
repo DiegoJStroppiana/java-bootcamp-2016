@@ -1,4 +1,4 @@
-package maven.exercise.bootCampTopic1Ex123;
+package maven.exercise.bootCampTopic2Ex2;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
