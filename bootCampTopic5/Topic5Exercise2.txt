@@ -1,0 +1,7 @@
+/*Topic 5*/
+/*Exercise 2*/
+/*Fetch all students whose notes in a specific course were greater than 4*/
+
+db.inscription.count ( { final_note : { $gt: 4} }, {id_course: 1},{year: 2015} );
+
+
