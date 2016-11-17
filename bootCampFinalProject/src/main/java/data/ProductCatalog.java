@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-
 import entities.Product;
 
 public class ProductCatalog {
@@ -80,6 +79,19 @@ public class ProductCatalog {
 		    preparedStmt.setInt (1, stock);
 		    preparedStmt.setInt (2, id_product);
 		    preparedStmt.execute();
+	    	return true;
+	    }
+		return false;
+	}
+	
+	public boolean suficientStock(int id_product, int stockRequired) throws SQLException{
+
+		Connection connect = ConnectionDB.getInstance().getConnection();
+		statement = connect.createStatement();
+	    resultSet = statement.executeQuery("SELECT stock FROM product WHERE id_product="+id_product);
+	    resultSet.next();
+	    int actualStock = resultSet.getInt(1);
+	    if(stockRequired<=actualStock){
 	    	return true;
 	    }
 		return false;

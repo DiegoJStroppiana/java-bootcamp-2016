@@ -24,7 +24,7 @@ public class UserCatalogTest {
 	
 	@Test
 	public void newUser() throws SQLException{
-		if (UserCatalog.getInstance().newUser("diegopujato","hola123","Diego","Stroppiana").equals("New user created")){
+		if (UserCatalog.getInstance().newUser("diegopujato","hola123","Diego","Stroppiana")){
 			assertTrue(true);
 			System.out.println("User created");
 		} else {

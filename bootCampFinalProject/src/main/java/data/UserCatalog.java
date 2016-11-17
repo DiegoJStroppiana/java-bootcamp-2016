@@ -28,7 +28,7 @@ public class UserCatalog {
 	}
 	
 	
-	public String newUser(String nick_name, String password, String first_name, String last_name) throws SQLException{
+	public boolean newUser(String nick_name, String password, String first_name, String last_name) throws SQLException{
 		Connection connect = ConnectionDB.getInstance().getConnection();
 		User u = getUser(nick_name);
 		if(u==null){			
@@ -40,9 +40,9 @@ public class UserCatalog {
 		      preparedStmt.setString (3, first_name);
 		      preparedStmt.setString (4, last_name);	
 		      preparedStmt.execute();	
-		return "New user created";
+		return true;
 		}
-		return "Nick name already exists";
+		return false;
 		
 	}
 	

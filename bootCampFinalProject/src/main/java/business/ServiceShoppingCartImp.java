@@ -2,41 +2,51 @@ package business;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import data.CartCatalog;
 import data.ProductCatalog;
 import data.UserCatalog;
 import entities.Cart;
 import entities.Product;
+import entities.ProductCart;
 import entities.User;
 
-@RestController
+
 public class ServiceShoppingCartImp implements ServiceShoppingCart{
 
-	User userLoggedIn;
-	Cart currentCart;
-	ArrayList<Product> productsAdded = new ArrayList<Product>();
-	ArrayList<Product> productsDeleted = new ArrayList<Product>();;
+	private User userLoggedIn = null;
+	private Cart currentCart = null;
+	private ArrayList<ProductCart> productsAdded = new ArrayList<ProductCart>();
+	private ArrayList<ProductCart> productsDeleted = new ArrayList<ProductCart>();
+	private ArrayList<String> productsUpdated = new ArrayList<String>();
 	
-	@RequestMapping("/")
+	
+	private static ServiceShoppingCartImp serviceShoppingCartImp = null;
+	
+	
+	private ServiceShoppingCartImp() {
+	}
+	
+	public static ServiceShoppingCartImp getInstance() {
+		if (serviceShoppingCartImp == null) {
+			serviceShoppingCartImp = new ServiceShoppingCartImp();
+		}
+		return serviceShoppingCartImp;
+	}
+	
 	public String welcome(){
 		return "Welcome to shopping cart REST api";
 	}
 
-	@RequestMapping("/login")
-	public String login(@RequestParam(value="nick_name", defaultValue="")String nick_name, @RequestParam(value="password", defaultValue="")String password, @RequestParam(value="newCart", defaultValue="no")String newCart) throws SQLException {
-		User u = UserCatalog.getInstance().getUser(nick_name);
-		if (u==null){
-			return "User doesn't exist";
+
+	public String login(String nick_name, String password, String newCart) throws SQLException {
+		if (userLoggedIn!=null){
+			return "You are already logged in";
 		}
-		if (u.getPassword().equals(password)){
-			userLoggedIn = u;
-		} else{
-			return "Incorrect password";
+		User u = UserCatalog.getInstance().getUser(nick_name);
+		if (u==null||!u.getPassword().equals(password)){
+			return "Incorrect user or password";
+		}else{
+			userLoggedIn = u;;
 		}
 		
 		currentCart=CartCatalog.getInstance().getCartFromDataBase(u.getId_user());
@@ -55,7 +65,7 @@ public class ServiceShoppingCartImp implements ServiceShoppingCart{
 		return "User logged";
 	}
 	
-	@RequestMapping("/logoff")
+
 	public String logoff(){
 		if (userLoggedIn==null){
 			return "You aren't logged in";
@@ -65,50 +75,70 @@ public class ServiceShoppingCartImp implements ServiceShoppingCart{
 		return "User logged off";
 	}
 	
-	@RequestMapping("/register")
-	public String register(@RequestParam(value="nick_name", defaultValue="")String nick_name, 
-						@RequestParam(value="password", defaultValue="")String password, 
-						@RequestParam(value="first_name", defaultValue="")String first_name, 
-						@RequestParam(value="last_name", defaultValue="")String last_name) throws SQLException {
-		UserCatalog.getInstance().newUser(nick_name, password, first_name, last_name);
-		userLoggedIn = UserCatalog.getInstance().getUser(nick_name);
-		return "User Created";
+
+	public String register(String nick_name,String password,String first_name, String last_name) throws SQLException {
+		if(UserCatalog.getInstance().newUser(nick_name, password, first_name, last_name)){
+			userLoggedIn = UserCatalog.getInstance().getUser(nick_name);
+			return "User Created";			
+		}
+		return "Nickname already exists";
 	}
 
-	@RequestMapping("/findByName")
-	public Product findProductByName(@RequestParam(value="name", defaultValue="")String name) throws SQLException {
+
+	public String findProductByName(String name) throws SQLException {
 		Product p = ProductCatalog.getInstance().findByName(name);
-		return p;
+		if (p==null){
+			return "Product doesn't exist";
+		}
+		return p.toString();
 	}
-
-	@RequestMapping("/findByCategory")
-	public ArrayList<Product> findProductByCategory(@RequestParam(value="category", defaultValue="")String category) throws SQLException {		
+	
+	public String findProductByCategory(String category) throws SQLException {		
 		ArrayList<Product> productList = ProductCatalog.getInstance().findByCategory(category);
-		return productList;
+		if(productList.size()==0){
+			return "Category doesn't exist or has not any product";	
+		}
+		String product = new String();
+		for (Product p: productList){			
+			product = product.concat(p.toString());
+		}
+		return product;
 	}
 
-	@RequestMapping("/addProductToCart")
-	public String addProductToCart(@RequestParam(value="name", defaultValue="") String name, 
-							@RequestParam(value="quantity", defaultValue="1")int quantity) throws SQLException {
+	public String addProductToCart(String name, int quantity) throws SQLException {
 		if (userLoggedIn==null){
 			return "You must be logged in";
 		}
 		if (ProductCatalog.getInstance().findByName(name)==null){
 			return "Product doesn't exist";
 		}
-		Product p = ProductCatalog.getInstance().findByName(name);
+		Product product = ProductCatalog.getInstance().findByName(name);
+		ProductCart p = new ProductCart();
+		p.setCategory(product.getCategory());
+		p.setId_product(product.getId_product());
+		p.setName(product.getName());
+		p.setPrice(product.getPrice());
 		p.setQuantity(quantity);
-		
-		currentCart.addProduct(p);
-		if (currentCart.getId_cart()!=0){
-			productsAdded.add(p);
+		if(currentCart.containsProduct(name)){
+			if(currentCart.addAQuantityOfAProduct(p.getId_product(), quantity)){
+				currentCart.setState("Not saved");
+				productsUpdated.add(name);
+				return "Quantity added to cart";
+			}
+			return "Insuficient stock";
+			
 		}
-		currentCart.setState("Not saved");
-		return "Item added to cart";
+		if(currentCart.addProduct(p)){
+			if (currentCart.getId_cart()!=0){
+				productsAdded.add(p);
+			}
+			currentCart.setState("Not saved");
+			return "Item added to cart";
+		}
+		return "Insuficient stock";
 	}
 	
-	@RequestMapping("/deleteProductFromCart")
-	public String deleteProductFromCart(@RequestParam(value="name", defaultValue="") String name) throws SQLException {
+	public String deleteProductFromCart( String name,int quantity) throws SQLException {
 		if (userLoggedIn==null){
 			return "You must be logged in";
 		}
@@ -116,42 +146,66 @@ public class ServiceShoppingCartImp implements ServiceShoppingCart{
 			return "Product doesn't exist";
 		}
 		int id_product = ProductCatalog.getInstance().findByName(name).getId_product();
+		if(quantity!=0){
+			if(currentCart.removeQuantityOfAProduct(id_product, quantity)){
+			currentCart.setState("Not saved");
+			productsUpdated.add(name);
+			return "You've removed " + quantity + " of " + name;
+			}
+			return "There isn't so many products of this type";
+		}
 		if(currentCart.removeProduct(id_product)){
 			currentCart.setState("Not saved");
-			if (currentCart.getId_cart()!=0){				
-				productsDeleted.add(ProductCatalog.getInstance().findByName(name));
+			if (currentCart.getId_cart()!=0){
+				Product product = ProductCatalog.getInstance().findByName(name);
+				ProductCart p = new ProductCart();
+				p.setCategory(product.getCategory());
+				p.setId_product(product.getId_product());
+				p.setName(product.getName());
+				p.setPrice(product.getPrice());
+				p.setQuantity(quantity);
+				productsDeleted.add(p);
 			}
 			return "Item deleted from cart";
 		}
 		return "Product isn't in the cart";
 	}
 	
-	@RequestMapping("/showCurrentCart")
-	public Cart showCurrentCart(){
-		return currentCart;		
+	public String showCurrentCart(){
+		if(userLoggedIn==null){
+			return "You aren't logged in";
+		}
+		if(currentCart.getProductList().size()==0){
+			return "Empty cart";
+		}		
+		return currentCart.toString();		
 	}
 
-	@RequestMapping("/saveCart")
 	public String saveCart() throws SQLException {
 		if(userLoggedIn==null){
 			return "You must be logged in";
 		}
 		if (currentCart.getProductList().size()==0){
+			if (currentCart.getId_cart()!=0){
+				CartCatalog.getInstance().deleteCartFromDataBase(currentCart);
+				return "Your cart has not any products - Your cart has been removed";
+			}
 			return "Your cart has not any products";
 		}
 		if (currentCart.getId_cart()!=0){
-			CartCatalog.getInstance().updateCartProducts(currentCart, productsAdded, productsDeleted);
-			productsAdded = new ArrayList<Product>();
-			productsDeleted = new ArrayList<Product>();;
+			CartCatalog.getInstance().updateCartProducts(currentCart, productsAdded, productsDeleted, productsUpdated);
+			productsAdded = new ArrayList<ProductCart>();
+			productsDeleted = new ArrayList<ProductCart>();
+			productsUpdated = new ArrayList<String>();
+			currentCart.setState("Saved");
 		} else {
 			currentCart.setState("Saved");
 			CartCatalog.getInstance().saveCart(currentCart);
-		}	
+		}			
 		currentCart=CartCatalog.getInstance().getCartFromDataBase(userLoggedIn.getId_user());
 		return "Your cart has been saved";
 	}
 	
-	@RequestMapping("/buyCurrentCart")
 	public String buyCart() throws SQLException {
 		if(userLoggedIn==null){
 			return "You must be logged in";
@@ -162,8 +216,8 @@ public class ServiceShoppingCartImp implements ServiceShoppingCart{
 		if (currentCart.getId_cart()!=0){
 		CartCatalog.getInstance().deleteCartFromDataBase(currentCart);
 		}
-		ArrayList<Product> productListToUpdate = currentCart.getProductList();
-		for(Product p : productListToUpdate){
+		ArrayList<ProductCart> productListToUpdate = currentCart.getProductList();
+		for(ProductCart p : productListToUpdate){
 			ProductCatalog.getInstance().updateStock(p.getId_product(), p.getQuantity());
 		}
 		currentCart = new Cart();

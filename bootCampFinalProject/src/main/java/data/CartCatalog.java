@@ -8,7 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import entities.Cart;
-import entities.Product;
+import entities.ProductCart;
 
 public class CartCatalog {
 	private Statement statement;
@@ -49,8 +49,8 @@ public class CartCatalog {
 	    resultSet = statement.executeQuery("SELECT MAX(id_cart) FROM cart");
 	    resultSet.next();
 	    int id_cart=resultSet.getInt(1);   		
-		ArrayList<Product> productList = cart.getProductList();
-		for(Product p : productList){
+		ArrayList<ProductCart> productList = cart.getProductList();
+		for(ProductCart p : productList){
 		  String query2 = " INSERT INTO cart_product (id_cart, id_product, quantity)"
 			        + " VALUES (?, ?, ?)";
 		      PreparedStatement preparedStmt2 = connect.prepareStatement(query2);
@@ -95,14 +95,14 @@ public class CartCatalog {
 	    int id_cart = resultSet.getInt(1);
 	    cart.setId_cart(id_cart);
 	    cart.setState(resultSet.getString(2));
-	    ArrayList<Product> productList = new ArrayList<Product>();
+	    ArrayList<ProductCart> productList = new ArrayList<ProductCart>();
 	    
 	    resultSet = statement.executeQuery("SELECT cart_product.id_product, cart_product.quantity, product.name, product.category, product_price.price, product.stock"
 	    		+ " FROM cart_product INNER JOIN product ON cart_product.id_product=product.id_product "
 	    		+ " INNER JOIN product_price ON product.id_product=product_price.id_product "
 	    		+ " WHERE cart_product.id_cart="+id_cart);
 	    while(resultSet.next()){
-	    	Product p = new Product();	    	
+	    	ProductCart p = new ProductCart();	    	
 	    	p.setId_product(resultSet.getInt(1));
 	    	p.setQuantity(resultSet.getInt(2));
 	    	p.setName(resultSet.getString(3));
@@ -115,27 +115,47 @@ public class CartCatalog {
 		return cart;
 	}
 	
-	public boolean updateCartProducts(Cart cart, ArrayList<Product> productsAdded, ArrayList<Product> productsDeleted) throws SQLException{
+	public boolean updateCartProducts(Cart cart, ArrayList<ProductCart> productsAdded, ArrayList<ProductCart> productsDeleted, ArrayList<String> productsUpdated) throws SQLException{
 		Connection connect = ConnectionDB.getInstance().getConnection();
 		int id_cart = cart.getId_cart();
+		ArrayList<ProductCart> currentProducts = cart.getProductList();
 		
-		for(Product p: productsAdded){
+		for(ProductCart p: productsAdded){
 			String query = " INSERT INTO cart_product (id_cart, id_product, quantity) VALUES (?, ?, ?)";
 		    PreparedStatement preparedStmt = connect.prepareStatement(query);
 		    preparedStmt.setInt (1, id_cart);
 		    preparedStmt.setInt (2, p.getId_product());
 		    preparedStmt.setInt (3, p.getQuantity());
 		    preparedStmt.execute();
-		}
+		}		
 		
-		for(Product p: productsDeleted){
+		for(ProductCart p: productsDeleted){
 			String query = "DELETE FROM cart_product WHERE id_cart=? AND id_product=?";
 		    PreparedStatement preparedStmt = connect.prepareStatement(query);
 		    preparedStmt.setInt (1, id_cart);
 		    preparedStmt.setInt (2, p.getId_product());
 		    preparedStmt.execute();
 		}
-		return false;
+		
+		for(String name: productsUpdated){
+			for(ProductCart p : currentProducts){
+				if(name.equals(p.getName())){
+					if(p.getQuantity()==0){
+						String query = "DELETE FROM cart_product WHERE id_product=?";
+					    PreparedStatement preparedStmt = connect.prepareStatement(query);
+					    preparedStmt.setInt (1, p.getId_product());
+					    preparedStmt.execute();
+					} else{
+					String query = "UPDATE cart_product SET quantity=? WHERE id_product=?";
+				    PreparedStatement preparedStmt = connect.prepareStatement(query);
+				    preparedStmt.setInt (1, p.getQuantity());
+				    preparedStmt.setInt (2, p.getId_product());
+				    preparedStmt.execute();
+					}
+				}
+			}
+		}
+		return true;
 	}
 	
 		

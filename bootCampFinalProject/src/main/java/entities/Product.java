@@ -6,15 +6,10 @@ public class Product {
 	 private String category;
 	 private int stock;
 	 private double price;
-	 private int quantity;
+
 	 
 	 public Product(){
 		 
-	 }
-	 
-	 public Product(int id_product, int quantity){
-		 this.setId_product(id_product);
-		 this.setQuantity(quantity);
 	 }
 	 
 	 
@@ -48,14 +43,16 @@ public class Product {
 	public void setPrice(double price) {
 		this.price = price;
 	}
-	public int getQuantity() {
-		return quantity;
-	}
-	public void setQuantity(int quantity) {
-		this.quantity = quantity;
-	}
 	
-	
-	 
-	 
+	public String toString(){
+		String product = new String();
+		product = product.concat("Id_product: ").concat(Integer.toString(this.getId_product()));
+		product = product.concat(" - Name: ").concat(this.getName());
+		product = product.concat(" - Category: ").concat(this.getCategory());
+		product = product.concat(" - Stock: ").concat(Integer.toString(this.getStock()));
+		product = product.concat(" - Price: ").concat(Double.toString(this.getPrice())).concat("/// ");
+		return product;
+	}
+
+
 }
