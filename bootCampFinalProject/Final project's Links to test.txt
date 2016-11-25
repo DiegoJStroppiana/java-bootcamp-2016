@@ -1,0 +1,43 @@
+
+localhost:8080/
+
+localhost:8080/login?nick_name=""&password=""&newCart=""
+
+localhost:8080/logoff
+
+localhost:8080/register?nick_name=""&password=""&first_name=""&last_name=""
+
+localhost:8080/findByName?name=""
+
+localhost:8080/findByCategory?category=""
+
+localhost:8080/addProductToCart?name=""&quantity=""
+
+localhost:8080/deleteProductFromCart?name=""&quantity=""
+
+localhost:8080/showCurrentCart
+
+localhost:8080/saveCart
+
+localhost:8080/buyCurrentCart
+
+
+Product list:
+ 
+Tennis raquet Wilson
+Newell's Football shirt
+Jockey stick
+Rugby ball
+Newell's Football pants
+Notebook Dell i7
+Samsung S7 EDGE
+Moto X Play 32gb
+Moto X Play 16gb
+Samsung J7
+Samsung A5
+Samsung Smart TV 55
+Table 200x150
+Fridge Whirlpool
+Microwave Philips
+
+
